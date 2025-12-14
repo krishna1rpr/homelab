@@ -1,0 +1,5 @@
+services:
+  excalidraw:
+    image: excalidraw/excalidraw:latest
+    ports:
+    - 5005:80

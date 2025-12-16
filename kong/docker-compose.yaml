@@ -5,7 +5,7 @@ networks:
   kong-CT:      # Custom bridge network for isolated Kong and Postgres communication
     driver: bridge
   central-shared-nt:
-    driver: bridge
+    external: true
 
 # Common environment variables used by Kong services (bootstrap and CP)
 x-kong-config: &kong-env
@@ -20,12 +20,18 @@ services:
 
   kong-db-CT:
     container_name: kong-db-CT
-    image: postgres:latest           # Official Postgres image
+
+    # updating the postgres image for making it ready for CDC
+    image: debezium/postgres:15
+
+    # image: postgres:latest           # Official Postgres image
+    
     restart: on-failure              # Restart if the container fails
     volumes:
       - kong_db_data:/var/lib/postgresql  # Mount the volume for persistent data
     networks:
       - kong-CT                  # Connect to the shared Kong network
+      - central-shared-nt
     environment:
       POSTGRES_USER: kong            # Set DB user inside the container
       POSTGRES_DB: kong              # Create this database on first run

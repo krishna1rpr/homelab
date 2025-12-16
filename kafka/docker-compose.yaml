@@ -1,0 +1,45 @@
+volumes:
+  kafka-CT_data: {}
+
+networks:
+  kafka-CT:
+    external: true
+
+services:
+  kafka-CT:
+    image: apache/kafka:3.8.1
+    container_name: kafka-CT
+    hostname: kafka
+    restart: on-failure:3
+
+    networks:
+      - kafka-CT
+
+    volumes:
+      - kafka-CT_data:/var/lib/kafka/data
+
+    ports:
+      - "29092:29092"
+
+    environment:
+      # --- KRaft identity ---
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+
+      # --- Listeners ---
+      KAFKA_LISTENERS: INTERNAL://kafka:9092,CONTROLLER://kafka:9093,EXTERNAL://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT
+
+      # --- Listener roles ---
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+      # --- Storage ---
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+
+      # --- Single-node safety ---
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1

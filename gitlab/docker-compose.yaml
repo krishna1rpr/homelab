@@ -1,0 +1,32 @@
+services:
+  gitlab-CT:
+    image: gitlab/gitlab-ce
+    container_name: gitlab-CT
+    # restart: on-failure
+    hostname: 'localhost'
+    environment:
+      GITLAB_ROOT_EMAIL: "admin@admin.com"
+      GITLAB_ROOT_PASSWORD: "adminadmin"
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://localhost:80'
+        nginx['listen_port'] = 80
+    ports:
+      - '8200:80'
+      # - '443:443'
+      - '33:22'
+    volumes:
+      - './gitlab-CT/config:/etc/gitlab'
+      - './gitlab-CT/logs:/var/log/gitlab'
+      - './gitlab-CT/data:/var/opt/gitlab'
+    
+    deploy:
+      resources:
+        limits:
+          cpus: '5'    # Hard limit of 50% of one CPU core
+          memory: 512M   # Hard limit of 512MB RAM
+    shm_size: '256m'
+
+  # gitlab-runner-CT:
+  #   image: gitlab/gitlab-runner:ubuntu-17c92b34
+  #   container_name: gitlab-runner
+  #   network_mode: 'host'

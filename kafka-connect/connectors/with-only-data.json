@@ -1,0 +1,38 @@
+{
+  "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+
+  "database.hostname": "kong-db-CT",
+  "database.port": "5432",
+  "database.user": "kong",
+  "database.password": "kong",
+  "database.dbname": "kong",
+
+  "plugin.name": "pgoutput",
+
+  "slot.name": "kong_cdc_slot",
+  "publication.name": "kong_cdc_pub",
+
+  "schema.include.list": "public",
+  "table.include.list": "public.services,public.routes,public.plugins,public.consumers",
+
+  "topic.prefix": "kong",
+
+  "snapshot.mode": "initial",
+
+  "decimal.handling.mode": "string",
+  "tombstones.on.delete": "false",
+
+  "heartbeat.interval.ms": "10000",
+  "include.schema.changes": "true",
+
+  "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "key.converter.schemas.enable": "false",
+  "value.converter.schemas.enable": "false",
+
+  "transforms": "unwrap",
+  "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+  "transforms.unwrap.add.fields": "op,table,source.ts_ms",
+  "transforms.unwrap.delete.handling.mode": "rewrite",
+  "transforms.unwrap.drop.tombstones": "true"
+}

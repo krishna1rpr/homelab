@@ -1,0 +1,25 @@
+services:
+
+  vpn:
+    image: qmcgaw/gluetun
+    container_name: vpn
+    cap_add:
+      - NET_ADMIN
+    env_file:
+      - .env
+    ports:
+      - 5010:8081   # expose MeTube UI via VPN container
+    restart: unless-stopped
+
+
+  metube:
+    image: ghcr.io/alexta69/metube
+    container_name: metube
+    restart: unless-stopped
+    network_mode: "service:vpn"
+    depends_on:
+      - vpn
+    # ports:
+    #   - "5011:8081"
+    volumes:
+      - ./metube_downloads:/downloads

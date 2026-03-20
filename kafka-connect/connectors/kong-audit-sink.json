@@ -1,0 +1,41 @@
+{
+  "name": "kong-audit-sink",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+
+    "connection.url": "jdbc:postgresql://audit-db:5432/auditdb",
+    "connection.user": "audit",
+    "connection.password": "audit",
+
+    "topics.regex": "kong\\.public\\..*",
+
+    "insert.mode": "insert",
+    "pk.mode": "none",
+
+    "auto.create": "false",
+    "auto.evolve": "false",
+
+    "table.name.format": "kong_audit_log",
+
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+
+    "transforms": "route,rename,ts,remove",
+
+    "transforms.route.type": "org.apache.kafka.connect.transforms.RegexRouter",
+    "transforms.route.regex": ".*",
+    "transforms.route.replacement": "kong_audit_log",
+
+    "transforms.rename.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+    "transforms.rename.renames": "__table:source_table,__op:operation",
+
+    "transforms.ts.type": "org.apache.kafka.connect.transforms.TimestampConverter$Value",
+    "transforms.ts.field": "__source_ts_ms",
+    "transforms.ts.target.type": "Timestamp",
+    "transforms.ts.format": "unix_ms",
+    "transforms.ts.target.field": "event_ts",
+
+    "transforms.remove.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+    "transforms.remove.blacklist": "__source_ts_ms,__deleted"
+  }
+}

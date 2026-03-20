@@ -1,0 +1,26 @@
+volumes:
+  audit_db_data: {}
+
+networks:
+  central-shared-nt:
+    external: true
+
+services:
+  audit-db:
+    image: postgres:15
+    container_name: audit-db
+    restart: on-failure
+
+    networks:
+      - central-shared-nt
+
+    ports:
+      - "5433:5432"   # host:container (avoid clashing with Kong DB)
+
+    volumes:
+      - audit_db_data:/var/lib/postgresql/data
+
+    environment:
+      POSTGRES_DB: auditdb
+      POSTGRES_USER: audit
+      POSTGRES_PASSWORD: audit
